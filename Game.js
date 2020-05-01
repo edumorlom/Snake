@@ -1,16 +1,15 @@
 /* jshint esversion: 7 */
 import Snake from './Snake.js';
-var Game = /** @class */ (function () {
-    function Game(height, width) {
-        var _this = this;
+export default class Game {
+    constructor(height, width) {
         this.snake = new Snake(0, 0);
         this.food = { row: 0, column: 0 };
         this.height = 0;
         this.width = 0;
-        this.rows = 30;
+        this.rows = 20;
         this.columns = 50;
         this.direction = 'up';
-        this.speed = 150;
+        this.speed = 75;
         this.score = 0;
         this.interval = 0;
         this.highScore = 0;
@@ -18,119 +17,122 @@ var Game = /** @class */ (function () {
         this.highScoreHTML = document.getElementById("highScore");
         this.snakeBodyHTML = document.getElementById("snakeBody");
         this.foodHTML = document.getElementById("food");
-        this.start = function () {
-            _this.snake = new Snake(_this.rows, _this.columns);
-            _this.interval = setInterval(_this.gameOn, _this.speed);
-            _this.drawFood();
+        this.start = () => {
+            this.snake = new Snake(this.rows, this.columns);
+            this.interval = setInterval(this.gameOn, this.speed);
+            this.drawFood();
         };
-        this.gameOff = function () {
-            clearInterval(_this.interval);
-            if (_this.snakeBodyHTML)
-                _this.snakeBodyHTML.className = "fadeOutAnimation";
-            if (_this.foodHTML)
-                _this.foodHTML.className = "fadeOutAnimation";
-            setTimeout(function () {
+        this.gameOff = () => {
+            clearInterval(this.interval);
+            if (this.snakeBodyHTML)
+                this.snakeBodyHTML.className = "fadeOutAnimation";
+            if (this.foodHTML)
+                this.foodHTML.className = "fadeOutAnimation";
+            setTimeout(() => {
                 var _a, _b;
-                (_a = _this.snakeBodyHTML) === null || _a === void 0 ? void 0 : _a.remove();
-                (_b = _this.foodHTML) === null || _b === void 0 ? void 0 : _b.remove();
+                (_a = this.snakeBodyHTML) === null || _a === void 0 ? void 0 : _a.remove();
+                (_b = this.foodHTML) === null || _b === void 0 ? void 0 : _b.remove();
                 alert("You died! Play Again?");
                 location.reload();
             }, 2000);
         };
-        this.newFood = function () {
+        this.newFood = () => {
             return {
-                row: Math.floor(Math.random() * _this.rows),
-                column: Math.floor(Math.random() * _this.rows)
+                row: (Math.floor(Math.random() * this.rows) % this.rows),
+                column: (Math.floor(Math.random() * this.columns) % this.columns)
             };
         };
-        this.gameOn = function () {
-            _this.snake.move(_this.direction);
-            if (_this.snake.eats(_this.direction, _this.food)) {
-                _this.food = _this.newFood();
-                _this.incrementScore(1);
+        this.gameOn = () => {
+            this.snake.move(this.direction);
+            if (this.snake.eats(this.direction, this.food)) {
+                this.food = this.newFood();
+                this.incrementScore(1);
             }
-            if (!_this.snake.alive)
-                _this.gameOff();
+            if (!this.snake.alive)
+                this.gameOff();
             else
-                _this.render();
+                this.render();
         };
-        this.incrementScore = function (increment) {
-            _this.score += increment;
-            var score = document.getElementById('score');
+        this.incrementScore = (increment) => {
+            this.score += increment;
+            let score = document.getElementById('score');
             if (score)
-                score.innerHTML = String(_this.score);
-            console.log(localStorage.getItem('highScore'));
-            if (Number(localStorage.getItem('highScore')) <= _this.score)
-                _this.updateHighScore();
+                score.innerHTML = String(this.score);
+            if (Number(localStorage.getItem('highScore')) <= this.score)
+                this.updateHighScore();
         };
-        this.updateHighScore = function () {
-            _this.highScore = _this.score;
-            localStorage.setItem("highScore", String(_this.highScore));
-            var highScore = document.getElementById("highScore");
+        this.updateHighScore = () => {
+            this.highScore = this.score;
+            localStorage.setItem("highScore", String(this.highScore));
+            let highScore = document.getElementById("highScore");
             if (highScore)
-                highScore.innerHTML = String(_this.highScore);
+                highScore.innerHTML = String(this.highScore);
         };
-        this.render = function () {
-            _this.drawSnake();
-            _this.drawFood();
+        this.render = () => {
+            this.drawSnake();
+            this.drawFood();
         };
-        this.getCoordinate = function (row, column) {
+        this.getCoordinate = (row, column) => {
             return {
-                x: Math.floor((column / _this.columns) * _this.width) % _this.width,
-                y: Math.floor((row / _this.rows) * _this.height) % _this.height
+                x: Math.floor((Math.floor(column) / this.columns) * this.width) % this.width,
+                y: Math.floor((Math.floor(row) / this.rows) * this.height) % this.height
             };
         };
-        this.setDirection = function (direction) {
-            if (_this.snake.bodyPosition.length > 1) {
-                if (direction == 'up' && _this.direction === 'down')
+        this.setDirection = (direction) => {
+            if (this.snake.bodyPosition.length > 1) {
+                if (direction == 'up' && this.direction === 'down')
                     return;
-                if (direction == 'down' && _this.direction === 'up')
+                if (direction == 'down' && this.direction === 'up')
                     return;
-                if (direction == 'left' && _this.direction === 'right')
+                if (direction == 'left' && this.direction === 'right')
                     return;
-                if (direction == 'right' && _this.direction === 'left')
+                if (direction == 'right' && this.direction === 'left')
                     return;
             }
-            _this.direction = direction;
+            if (this.direction != direction) {
+                this.direction = direction;
+                this.snake.move(direction);
+                this.snake.hold = true;
+                // setTimeout(() => { this.snake.hold = false }, this.speed);
+            }
         };
-        this.drawSnake = function () {
+        this.drawSnake = () => {
             var _a;
-            (_a = _this.snakeBodyHTML) === null || _a === void 0 ? void 0 : _a.remove();
-            var htmlBody = document.getElementsByTagName("body")[0];
-            _this.snakeBodyHTML = document.createElement("div");
-            _this.snakeBodyHTML.style.position = "absolute";
-            _this.snakeBodyHTML.id = "snakeBody";
-            htmlBody.append(_this.snakeBodyHTML);
-            for (var _i = 0, _b = _this.snake.bodyPosition; _i < _b.length; _i++) {
-                var part = _b[_i];
-                var square = document.createElement("div");
+            (_a = this.snakeBodyHTML) === null || _a === void 0 ? void 0 : _a.remove();
+            let htmlBody = document.getElementsByTagName("body")[0];
+            this.snakeBodyHTML = document.createElement("div");
+            this.snakeBodyHTML.style.position = "absolute";
+            this.snakeBodyHTML.id = "snakeBody";
+            htmlBody.prepend(this.snakeBodyHTML);
+            for (let part of this.snake.bodyPosition) {
+                let square = document.createElement("div");
                 square.className = "square";
-                var squareCoordinate = _this.getCoordinate(part.row, part.column);
+                let squareCoordinate = this.getCoordinate(part.row, part.column);
                 square.style.left = squareCoordinate.x + 'px';
                 square.style.top = squareCoordinate.y + 'px';
-                _this.snakeBodyHTML.append(square);
+                this.snakeBodyHTML.append(square);
             }
         };
-        this.drawFood = function () {
+        this.drawFood = () => {
             var _a;
-            (_a = _this.foodHTML) === null || _a === void 0 ? void 0 : _a.remove();
-            var htmlBody = document.getElementsByTagName("body")[0];
-            _this.foodHTML = document.createElement("div");
-            _this.foodHTML.className = "food";
-            _this.foodHTML.id = "food";
-            var foodCoordinate = _this.getCoordinate(_this.food.row, _this.food.column);
-            _this.foodHTML.style.left = foodCoordinate.x + 'px';
-            _this.foodHTML.style.top = foodCoordinate.y + 'px';
-            htmlBody.append(_this.foodHTML);
+            (_a = this.foodHTML) === null || _a === void 0 ? void 0 : _a.remove();
+            let htmlBody = document.getElementsByTagName("body")[0];
+            this.foodHTML = document.createElement("div");
+            this.foodHTML.className = "food";
+            this.foodHTML.id = "food";
+            let foodCoordinate = this.getCoordinate(this.food.row, this.food.column);
+            this.foodHTML.style.left = foodCoordinate.x + 'px';
+            this.foodHTML.style.top = foodCoordinate.y + 'px';
+            htmlBody.append(this.foodHTML);
         };
         this.width = width;
         this.height = height;
+        this.rows = Math.floor(this.height / 30);
+        this.columns = Math.floor(this.width / 30);
         this.food = this.newFood();
         this.highScore = Number(localStorage.getItem("highScore")) || 0;
         if (this.highScoreHTML)
             this.highScoreHTML.innerHTML = String(this.highScore);
         this.start();
     }
-    return Game;
-}());
-export default Game;
+}

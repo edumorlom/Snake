@@ -1,8 +1,11 @@
+
+
 export default class SnakeComponent {
   bodyPosition: Array<{ row: number, column: number }> = []
   rows: number = 0;
   columns: number = 0;
   alive: boolean = true;
+  hold: boolean = false;
 
   constructor(rows: number, columns: number) {
     this.bodyPosition = [{ row: Math.floor(rows / 2), column: Math.floor(columns / 2) }]
@@ -37,7 +40,14 @@ export default class SnakeComponent {
     /**
      * Simplifies all the different variations of move into one method and checks to see if there snake is still alive.
      */
-    if (direction == "up") this.moveUp()
+
+    // If there is a hold on this function, return otherwise move the snake.
+    // A hold is added to prevent the computer double moving the snake after every move.
+    // Because this function is called every a few ms as well as when the person presses the key.
+    // We don't want the snake.move() being called twice within the same interval.
+
+    if (this.hold) {this.hold = false}
+    else if (direction == "up") this.moveUp()
     else if (direction == "down") this.moveDown()
     else if (direction == "left") this.moveLeft()
     else if (direction == "right") this.moveRight()
@@ -63,7 +73,7 @@ export default class SnakeComponent {
     /**
      * Moves the snake down the y-axis.
      */
-    let row = this.bodyPosition[0].row + 1;
+    let row = this.bodyPosition[0].row + 1
     if (row > this.rows) row = 0
     this.bodyPosition = [{row: row, column: (this.bodyPosition[0].column) % this.columns}, ...this.bodyPosition.slice(0, -1)]
   }
@@ -82,7 +92,7 @@ export default class SnakeComponent {
      * Moves the snake to the left in the y-axis.
      */
     let column = this.bodyPosition[0].column + 1
-    if (column < 0) column = this.columns
+    if (column > this.columns) column = 0
     this.bodyPosition = [{row: (this.bodyPosition[0].row) % this.rows, column: column}, ...this.bodyPosition.slice(0, -1)]
   }
 }

@@ -2,26 +2,28 @@
 import Snake from './Snake.js'
 export default class Game {
     snake: Snake = new Snake(0, 0);
-    food: {row: number, column: number} = {row: 0, column: 0}
+    food: { row: number, column: number } = { row: 0, column: 0 };
     height: number = 0;
     width: number = 0;
-    rows: number = 30;
+    rows: number = 20;
     columns: number = 50;
     direction: string = 'up';
-    speed: number = 150;
+    speed: number = 75;
     score: number = 0;
     interval: number = 0;
     highScore: number = 0;
     scoreHTML = document.getElementById("score");
-    highScoreHTML = document.getElementById("highScore")
-    snakeBodyHTML = document.getElementById("snakeBody")
-    foodHTML = document.getElementById("food")
+    highScoreHTML = document.getElementById("highScore");
+    snakeBodyHTML = document.getElementById("snakeBody");
+    foodHTML = document.getElementById("food");
 
 
     constructor(height: number, width: number) {
         this.width = width;
         this.height = height;
-        this.food = this.newFood()
+        this.rows = Math.floor(this.height / 30);
+        this.columns = Math.floor(this.width / 30);
+        this.food = this.newFood();
         this.highScore = Number(localStorage.getItem("highScore")) || 0
         if (this.highScoreHTML) this.highScoreHTML.innerHTML = String(this.highScore)
         this.start();
@@ -47,9 +49,9 @@ export default class Game {
 
     newFood = () => {
         return {
-            row: Math.floor(Math.random() * this.rows),
-            column: Math.floor(Math.random() * this.rows)
-          }
+            row: (Math.floor(Math.random() * this.rows) % this.rows),
+            column: (Math.floor(Math.random() * this.columns) % this.columns)
+        }
     }
 
     gameOn = () => {
@@ -58,6 +60,7 @@ export default class Game {
             this.food = this.newFood()
             this.incrementScore(1)
         }
+
         if (!this.snake.alive) this.gameOff()
         else this.render()
     }
@@ -66,7 +69,6 @@ export default class Game {
         this.score += increment
         let score = document.getElementById('score')
         if (score) score.innerHTML = String(this.score)
-        console.log(localStorage.getItem('highScore'))
         if (Number(localStorage.getItem('highScore')) <= this.score) this.updateHighScore()
     }
 
@@ -82,22 +84,27 @@ export default class Game {
         this.drawFood()
     }
 
-
     getCoordinate = (row: number, column: number): { x: number, y: number } => {
         return {
-            x: Math.floor((column / this.columns) * this.width) % this.width,
-            y: Math.floor((row / this.rows) * this.height) % this.height
+            x: Math.floor((Math.floor(column) / this.columns) * this.width) % this.width,
+            y: Math.floor((Math.floor(row) / this.rows) * this.height) % this.height
         }
     }
 
     setDirection = (direction: string) => {
-            if (this.snake.bodyPosition.length > 1) {
+        if (this.snake.bodyPosition.length > 1) {
             if (direction == 'up' && this.direction === 'down') return
             if (direction == 'down' && this.direction === 'up') return
             if (direction == 'left' && this.direction === 'right') return
             if (direction == 'right' && this.direction === 'left') return
         }
-        this.direction = direction
+
+        if (this.direction != direction) {
+            this.direction = direction;
+            this.snake.move(direction)
+            this.snake.hold = true;
+            // setTimeout(() => { this.snake.hold = false }, this.speed);
+        }
     }
 
 
@@ -107,7 +114,7 @@ export default class Game {
         this.snakeBodyHTML = document.createElement("div")
         this.snakeBodyHTML.style.position = "absolute"
         this.snakeBodyHTML.id = "snakeBody"
-        htmlBody.append(this.snakeBodyHTML)
+        htmlBody.prepend(this.snakeBodyHTML)
 
         for (let part of this.snake.bodyPosition) {
             let square: HTMLElement = document.createElement("div")

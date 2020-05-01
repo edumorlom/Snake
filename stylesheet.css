@@ -28,7 +28,9 @@ h1, h2{
 .scoreBoard {
     display: inline-block;
     position: absolute;
-    width: 25em;
+    width: 11em;
+    margin: 2em;
+    background-color: #00539C;
 }
 
 
