@@ -9,10 +9,12 @@ export default function addSwipeEventListener(element, up, down, left, right, ta
     const limit = Math.tan(45 * 1.5 / 180 * Math.PI);
     const gestureZone = element;
     gestureZone.addEventListener('touchstart', (e) => {
+        e.preventDefault();
         touchstartX = e.changedTouches[0].screenX;
         touchstartY = e.changedTouches[0].screenY;
     }, false);
     gestureZone.addEventListener('touchend', (e) => {
+        e.preventDefault();
         touchendX = e.changedTouches[0].screenX;
         touchendY = e.changedTouches[0].screenY;
         handleGesture(e);

@@ -12,16 +12,17 @@ export default function addSwipeEventListener(element: any, up: VoidFunction, do
     const gestureZone = element;
 
     gestureZone.addEventListener('touchstart', (e: TouchEvent) => {
+        e.preventDefault();
         touchstartX = e.changedTouches[0].screenX;
         touchstartY = e.changedTouches[0].screenY;
     }, false);
 
     gestureZone.addEventListener('touchend', (e: TouchEvent) => {
+        e.preventDefault();
         touchendX = e.changedTouches[0].screenX;
         touchendY = e.changedTouches[0].screenY;
         handleGesture(e);
     }, false);
-
 
     let handleGesture = (e: Event) => {
         let x = touchendX - touchstartX;

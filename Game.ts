@@ -1,5 +1,6 @@
 /* jshint esversion: 7 */
 import Snake from './Snake.js'
+
 export default class Game {
     snake: Snake = new Snake(0, 0);
     food: { row: number, column: number } = { row: 0, column: 0 };
@@ -8,7 +9,7 @@ export default class Game {
     rows: number = 20;
     columns: number = 50;
     direction: string = 'up';
-    speed: number = 75;
+    speed: number = 130;
     score: number = 0;
     interval: number = 0;
     highScore: number = 0;

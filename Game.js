@@ -9,7 +9,7 @@ export default class Game {
         this.rows = 20;
         this.columns = 50;
         this.direction = 'up';
-        this.speed = 75;
+        this.speed = 130;
         this.score = 0;
         this.interval = 0;
         this.highScore = 0;
